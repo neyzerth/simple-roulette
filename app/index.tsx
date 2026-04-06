@@ -1,6 +1,6 @@
 import { animatedStyle, spin } from '@/components/AnimatedWheel';
 import Wheel from '@/components/Wheel';
-import { Button, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import Animated from 'react-native-reanimated';
 
 const items = [
@@ -15,7 +15,7 @@ const items = [
 export default function Index() {
   return (
     <View
-      style={style.container}
+      style={styles.container}
     >
       <Text>My Wheel!! 🛞😁</Text>
 
@@ -28,13 +28,13 @@ export default function Index() {
     </View>
   );
 }
-const style = {
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "center" as const,
     alignItems: "center" as const,
-    paddingVertical: 50,
+    gap: 20
   }
-};
+});
 
 
