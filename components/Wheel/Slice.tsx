@@ -16,7 +16,7 @@ export const Slice = ({ index, text, angle, radius }: Props) => {
     const start = polarToCartesian(radius, radius, radius, endAngle);
     const end = polarToCartesian(radius, radius, radius, startAngle);
 
-    const centerText = polarToCartesian(radius, radius, radius / 2, startAngle + angle / 2);
+    const centerText = polarToCartesian(radius, radius + 5, radius / 2, startAngle + angle / 2);
 
     const largeArcFlag = angle > 180 ? 1 : 0;
 
@@ -37,7 +37,7 @@ export const Slice = ({ index, text, angle, radius }: Props) => {
             fill="black"
             fontSize="14"
             textAnchor="middle"
-            transform={`rotate(${startAngle + angle * 2} ${centerText.x} ${centerText.y})`}
+            transform={`rotate(${startAngle + angle * 5} ${centerText.x} ${centerText.y})`}
         >
             {text}
         </Text>
