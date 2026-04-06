@@ -1,6 +1,7 @@
-import Wheel from '@/components/Wheel/Wheel';
-import React from 'react';
-import { Text, View } from "react-native";
+import { animatedStyle, spin } from '@/components/AnimatedWheel';
+import Wheel from '@/components/Wheel';
+import { Button, Text, View } from "react-native";
+import Animated from 'react-native-reanimated';
 
 const items = [
   'Item 1',
@@ -14,31 +15,26 @@ const items = [
 export default function Index() {
   return (
     <View
-      style={{
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+      style={style.container}
     >
-      <Text>Edit app/index.tsx to edit this text.</Text>
+      <Text>My Wheel!! 🛞😁</Text>
 
-      <Wheel items={items} />
+      <Animated.View style={animatedStyle}>
+        <Wheel items={items} />
+      </Animated.View>
+
+      <Button title="Spin" onPress={spin} />
 
     </View>
   );
 }
 const style = {
   container: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  semicircle: {
-    width: 100,
-    height: 50,
-    borderTopLeftRadius: 50,
-    borderTopRightRadius: 50,
-    backgroundColor: "#a6f",
-  },
+    flex: 1,
+    justifyContent: "center" as const,
+    alignItems: "center" as const,
+    paddingVertical: 50,
+  }
 };
 
 

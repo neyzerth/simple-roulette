@@ -1,4 +1,5 @@
 import { Path, Text } from "react-native-svg";
+import { polarToCartesian } from "./useWheelMaths";
 
 interface Props {
     index: number;
@@ -16,7 +17,7 @@ export const Slice = ({ index, text, angle, radius }: Props) => {
     const start = polarToCartesian(radius, radius, radius, endAngle);
     const end = polarToCartesian(radius, radius, radius, startAngle);
 
-    const centerText = polarToCartesian(radius, radius + 5, radius / 2, startAngle + angle / 2);
+    const centerText = polarToCartesian(radius, radius, radius / 2, startAngle + angle / 2 + 5);
 
     const largeArcFlag = angle > 180 ? 1 : 0;
 
@@ -42,14 +43,6 @@ export const Slice = ({ index, text, angle, radius }: Props) => {
             {text}
         </Text>
     </>
-}
-
-const polarToCartesian = (centerX: number, centerY: number, radius: number, angleInDegrees: number) => {
-    const angleInRadians = (angleInDegrees - 90) * Math.PI / 180.0;
-    return {
-        x: centerX + (radius * Math.cos(angleInRadians)),
-        y: centerY + (radius * Math.sin(angleInRadians))
-    };
 }
 
 const randomColor = (index: number) => {
