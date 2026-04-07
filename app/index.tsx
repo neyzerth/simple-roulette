@@ -2,6 +2,7 @@ import { useAnimatedWheel } from '@/components/AnimatedWheel';
 import { Arrow } from '@/components/Arrow';
 import Wheel from '@/components/Wheel';
 import { ItemsProvider } from '@/contexts/ItemsContext';
+import { useState } from 'react';
 import { Button, StyleSheet, Text, View } from "react-native";
 import Animated from 'react-native-reanimated';
 
@@ -15,11 +16,13 @@ const items = [
 ];
 
 const WheelScreen = () => {
-  const { spin, animatedStyle } = useAnimatedWheel();
+  const [winner, setWinner] = useState("--");
+  const { spin, animatedStyle } = useAnimatedWheel(setWinner);
 
   return (
     <View style={styles.container}>
-      <Text>My Wheel!! 🛞😁</Text>
+      <Text style={styles.title}>My Wheel!! 🛞😁</Text>
+      <Text style={styles.winner}>Winner: {winner}</Text>
 
       <View style={styles.wheel}>
         <Arrow />
@@ -53,7 +56,16 @@ const styles = StyleSheet.create({
   wheel: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  winner: {
+    fontSize: 18,
+    fontWeight: "bold",
   }
+
 });
 
 

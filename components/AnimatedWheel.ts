@@ -7,11 +7,13 @@ import {
 } from 'react-native-reanimated';
 import { getWinnerIndex } from './useWheelMaths';
 
-export const useAnimatedWheel = () => {
+export const useAnimatedWheel = (onWinner?: (winner: string) => void) => {
     const { items } = useItems();
     const rotation = useSharedValue(0);
 
     const spin = () => {
+        if (items.length === 0) return;
+
         const randomSpins = 5;
         const randomAngle = Math.random() * 360;
         const duration = 4000;
@@ -30,7 +32,9 @@ export const useAnimatedWheel = () => {
 
         setTimeout(() => {
             const winnerIndex = getWinnerIndex(rotation.value, items.length);
-            console.log('Winner:', items[winnerIndex], `[${winnerIndex}]`);
+            const winner = items[winnerIndex];
+            console.log('Winner:', winner, `[${winnerIndex}]`);
+            onWinner?.(winner);
         }, duration + 100);
     };
 
