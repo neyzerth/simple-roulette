@@ -1,5 +1,7 @@
-import { animatedStyle, spin } from '@/components/AnimatedWheel';
+import { useAnimatedWheel } from '@/components/AnimatedWheel';
+import { Arrow } from '@/components/Arrow';
 import Wheel from '@/components/Wheel';
+import { ItemsProvider } from '@/contexts/ItemsContext';
 import { Button, StyleSheet, Text, View } from "react-native";
 import Animated from 'react-native-reanimated';
 
@@ -12,28 +14,45 @@ const items = [
   'Item 6',
 ];
 
-export default function Index() {
+const WheelScreen = () => {
+  const { spin, animatedStyle } = useAnimatedWheel();
+
   return (
-    <View
-      style={styles.container}
-    >
+    <View style={styles.container}>
       <Text>My Wheel!! 🛞😁</Text>
 
-      <Animated.View style={animatedStyle}>
-        <Wheel items={items} />
-      </Animated.View>
+      <View style={styles.wheel}>
+        <Arrow />
+        <Animated.View style={animatedStyle}>
+          <Wheel items={items} />
+        </Animated.View>
+      </View>
 
       <Button title="Spin" onPress={spin} />
-
     </View>
   );
 }
+
+const Index = () => {
+  return (
+    <ItemsProvider initialItems={items}>
+      <WheelScreen />
+    </ItemsProvider>
+  );
+}
+
+export default Index;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center" as const,
-    alignItems: "center" as const,
+    justifyContent: "center",
+    alignItems: "center",
     gap: 20
+  },
+  wheel: {
+    justifyContent: "center",
+    alignItems: "center",
   }
 });
 

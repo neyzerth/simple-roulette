@@ -1,30 +1,47 @@
+import { useItems } from '@/contexts/ItemsContext';
 import {
     Easing,
     useAnimatedStyle,
     useSharedValue,
     withTiming
 } from 'react-native-reanimated';
+import { getWinnerIndex } from './useWheelMaths';
 
-const rotation = useSharedValue(0);
+export const useAnimatedWheel = () => {
+    const { items } = useItems();
+    const rotation = useSharedValue(0);
 
-export const spin = () => {
-    const randomSpins = 5;
-    const randomAngle = Math.random() * 360;
+    const spin = () => {
+        const randomSpins = 5;
+        const randomAngle = Math.random() * 360;
+        const duration = 4000;
 
-    rotation.value = withTiming(
-        rotation.value + randomSpins * 360 + randomAngle,
-        {
-            duration: 4000,
-            easing: Easing.out(Easing.cubic),
-        }
-    );
-};
+        const initialIndex = getWinnerIndex(rotation.value, items.length);
+        console.log('Init:', items[initialIndex], `[${initialIndex}]`);
 
-export const animatedStyle = useAnimatedStyle(() => {
-    return {
-        transform: [
-            { rotate: `${rotation.value}deg` }
-        ]
+
+        rotation.value = withTiming(
+            rotation.value + randomSpins * 360 + randomAngle,
+            {
+                duration: duration,
+                easing: Easing.out(Easing.cubic),
+            }
+        );
+
+        setTimeout(() => {
+            const winnerIndex = getWinnerIndex(rotation.value, items.length);
+            console.log('Winner:', items[winnerIndex], `[${winnerIndex}]`);
+        }, duration + 100);
     };
-});
+
+    const animatedStyle = useAnimatedStyle(() => {
+        return {
+            transform: [
+                { rotate: `${rotation.value}deg` }
+            ]
+        };
+    });
+
+    return { spin, animatedStyle };
+};
 

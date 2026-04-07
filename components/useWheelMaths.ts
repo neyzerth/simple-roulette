@@ -5,3 +5,16 @@ export const polarToCartesian = (centerX: number, centerY: number, radius: numbe
         y: centerY + (radius * Math.sin(angleInRadians))
     };
 }
+
+export const getWinnerIndex = (rotation: number, itemsLength: number) => {
+    const normalized = rotation % 360;
+    const effectiveAngle = (360 - normalized) % 360;
+
+    // Used when the pointer is at the top (0 degrees)
+    // we want to consider it as 360 degrees for easier calculations
+    const adjustedAngle = (effectiveAngle + 0) % 360;
+
+    const sliceAngle = 360 / itemsLength;
+
+    return Math.floor(adjustedAngle / sliceAngle);
+};
