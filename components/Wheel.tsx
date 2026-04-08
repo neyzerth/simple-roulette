@@ -1,17 +1,29 @@
-import Svg, { Circle } from 'react-native-svg';
+import { useItems } from '@/contexts/ItemsContext';
+import Svg, { Circle, Text } from 'react-native-svg';
 import { Slice } from './Slice';
 
 interface Props {
-    items: string[];
     size?: number;
-
 }
 
-const Wheel = ({ items, size = 300 }: Props) => {
+const Wheel = ({ size = 300 }: Props) => {
+    const items = useItems().items;
+
     const radius = size / 2;
     if (items.length <= 1) {
         return <Svg width={size} height={size}>
-            <Circle cx={radius} cy={radius} r={radius} fill={'#a6f'} />
+            <Circle cx={radius} cy={radius} r={radius}
+                strokeWidth={1} stroke={'#a6f'} fill={'#a6f6'} />
+            <Text
+                x={size / 2}
+                y={size / 2 + 5}
+                fill="black"
+                fontSize="25"
+                textAnchor="middle"
+            // transform={`rotate(${startAngle + angle * 5} ${centerText.x} ${centerText.y})`}
+            >
+                {items[0] || "Add items to spin!"}
+            </Text>
         </Svg>;
     }
     const angle = 360 / items.length;
