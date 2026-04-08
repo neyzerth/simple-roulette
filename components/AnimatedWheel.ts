@@ -19,8 +19,7 @@ export const useAnimatedWheel = (onWinner?: (winner: string) => void) => {
         const duration = 4000;
 
         const initialIndex = getWinnerIndex(rotation.value, items.length);
-        console.log('Init:', items[initialIndex], `[${initialIndex}]`);
-
+        // console.log('Init:', items[initialIndex], `[${initialIndex}]`);
 
         rotation.value = withTiming(
             rotation.value + randomSpins * 360 + randomAngle,
@@ -33,7 +32,7 @@ export const useAnimatedWheel = (onWinner?: (winner: string) => void) => {
         setTimeout(() => {
             const winnerIndex = getWinnerIndex(rotation.value, items.length);
             const winner = items[winnerIndex];
-            console.log('Winner:', winner, `[${winnerIndex}]`);
+            // console.log('Winner:', winner, `[${winnerIndex}]`);
             onWinner?.(winner);
         }, duration + 100);
     };
