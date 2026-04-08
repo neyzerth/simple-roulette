@@ -7,7 +7,7 @@ export const polarToCartesian = (centerX: number, centerY: number, radius: numbe
 }
 
 export const getWinnerIndex = (rotation: number, itemsLength: number) => {
-    const normalized = rotation % 360;
+    const normalized = rotation % 360 - 90;
     const effectiveAngle = (360 - normalized) % 360;
 
     // Used when the pointer is at the top (0 degrees)
