@@ -1,7 +1,6 @@
 export const parseTextToList = (text: string): string[] => {
     return text
-        .split('\n')
-        .flatMap(line => line.split(','))
+        .split(/[\n,]+/)
         .map(item => item.trim())
-        .filter(item => item.length > 0);
+        .filter(Boolean);
 };
