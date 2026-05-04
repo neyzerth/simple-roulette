@@ -18,12 +18,8 @@ export const useAnimatedWheel = (onWinner?: (winner: string) => void) => {
         const randomAngle = Math.random() * 360;
         const duration = 4000;
 
-        const initialIndex = getWinnerIndex(rotation.value, items.length);
-        // console.log('Init:', items[initialIndex], `[${initialIndex}]`);
-
-        rotation.value = withTiming(
-            rotation.value + randomSpins * 360 + randomAngle,
-            {
+        const winnerAngle = rotation.value + randomSpins * 360 + randomAngle;
+        rotation.value = withTiming(winnerAngle, {
                 duration: duration,
                 easing: Easing.out(Easing.cubic),
             }

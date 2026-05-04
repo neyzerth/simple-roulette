@@ -3,115 +3,187 @@ import { Arrow } from '@/components/Arrow';
 import { parseTextToList } from '@/components/listInput';
 import Wheel from '@/components/Wheel';
 import { ItemsProvider, useItems } from '@/contexts/ItemsContext';
-import { addList, getLists, List } from '@/storage/crud';
+import { addList, deleteList, getLists, List } from '@/storage/crud';
 import { useEffect, useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View } from "react-native";
+import { Button, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import Animated from 'react-native-reanimated';
 
 const WheelScreen = () => {
-  const [winner, setWinner] = useState("--");
-  const { spin, animatedStyle } = useAnimatedWheel(setWinner);
-  const { setItems } = useItems();
-  const [rawList, setRawList] = useState("");
+    const [winner, setWinner] = useState("--");
+    const { spin, animatedStyle } = useAnimatedWheel(setWinner);
+    const { setItems } = useItems();
+    const [rawList, setRawList] = useState("");
+    const [listName, setListName] = useState("");
+    const [savedLists, setSavedLists] = useState<List[]>([]);
 
-  const [list, setList] = useState<List[]>([]);
-
-  useEffect(() => {
-    const fetchLists = async () => {
-      const lists = await getLists();
-      setList(lists);
+    const loadSavedLists = async () => {
+        const lists = await getLists();
+        setSavedLists(lists);
     };
-    fetchLists();
-  }, []);
 
-  return (
-    <View style={styles.container}>
-      {/* <Text style={styles.title}>Ruletaaa 🗣️🗣️</Text> */}
-      <Text style={styles.winner}>Winner: {winner}</Text>
+    useEffect(() => {
+        loadSavedLists();
+    }, []);
 
-      <View style={styles.wheel}>
-        <Arrow />
-        <Animated.View onTouchStart={spin} style={animatedStyle}>
-          <Wheel />
-        </Animated.View>
-      </View>
+    const handleSave = async () => {
+        await addList(listName, rawList);
+        setListName("");
+        setRawList("");
+        await loadSavedLists();
+    };
 
-      <TextInput
-        multiline
-        numberOfLines={15}
-        placeholder="Item 1..."
-        placeholderTextColor="#999"
-        style={styles.textArea}
-        onChangeText={(text) => {
-          setRawList(text);
-          setItems(parseTextToList(text));
-        }}
-      />
-      <Button title="Save List" onPress={async () => {
-        await addList("", rawList);
-        setList(await getLists());
-      }} />
+    const handleLoad = (list: List) => {
+        setRawList(list.rawList);
+        setItems(parseTextToList(list.rawList));
+    };
 
-      <View style={styles.list}>
-        {list.map((list, index) => (
-          <View key={index} style={{ marginBottom: 10 }}>
-            <Text style={{ fontWeight: 'bold' }}>{list.name}</Text>
-            <Text>{list.rawList}</Text>
-          </View>
-        ))}
-      </View>
+    const handleDelete = async (index: number) => {
+        await deleteList(index);
+        await loadSavedLists();
+    };
 
-    </View>
-  );
-}
+    return (
+        <View style={styles.container}>
+            <Text style={styles.winner}>Winner: {winner}</Text>
+
+            <View style={styles.wheel}>
+                <Arrow />
+                <Animated.View onTouchStart={spin} style={animatedStyle}>
+                    <Wheel />
+                </Animated.View>
+            </View>
+
+            <TextInput
+                placeholder="List name..."
+                placeholderTextColor="#999"
+                style={styles.nameInput}
+                value={listName}
+                onChangeText={setListName}
+            />
+
+            <TextInput
+                multiline
+                numberOfLines={5}
+                placeholder="Item 1, Item 2, Item 3..."
+                placeholderTextColor="#999"
+                style={styles.textArea}
+                value={rawList}
+                onChangeText={(text) => {
+                    setRawList(text);
+                    setItems(parseTextToList(text));
+                }}
+            />
+
+            <Button title="Save List" onPress={handleSave} disabled={!rawList.trim()} />
+
+            <View style={styles.list}>
+                {savedLists.length === 0 && (
+                    <Text style={styles.emptyText}>No saved lists yet</Text>
+                )}
+                {savedLists.map((list, index) => (
+                    <Pressable
+                        key={index}
+                        style={styles.listItem}
+                        onPress={() => handleLoad(list)}
+                    >
+                        <View style={styles.listContent}>
+                            <Text style={styles.listName}>{list.name}</Text>
+                            <Text style={styles.listPreview} numberOfLines={1}>
+                                {list.rawList}
+                            </Text>
+                        </View>
+                        <Button
+                            title="Delete"
+                            onPress={() => handleDelete(index)}
+                        />
+                    </Pressable>
+                ))}
+            </View>
+        </View>
+    );
+};
 
 const Index = () => {
-  return (
-    <ItemsProvider initialItems={[]}>
-      <WheelScreen />
-    </ItemsProvider>
-  );
-}
+    return (
+        <ItemsProvider initialItems={[]}>
+            <WheelScreen />
+        </ItemsProvider>
+    );
+};
 
 export default Index;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20
-  },
-  wheel: {
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-  winner: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  textArea: {
-    minHeight: 100,
-    width: 200,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    textAlignVertical: 'top',
-    fontSize: 16,
-    borderRadius: 5,
-  },
-  list: {
-    width: "80%",
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  }
-
+    container: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        gap: 12,
+        padding: 10,
+    },
+    wheel: {
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    title: {
+        fontSize: 22,
+        fontWeight: "bold",
+    },
+    winner: {
+        fontSize: 18,
+        fontWeight: "bold",
+    },
+    nameInput: {
+        height: 40,
+        width: 250,
+        padding: 8,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        fontSize: 14,
+        borderRadius: 5,
+    },
+    textArea: {
+        minHeight: 80,
+        width: 250,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        textAlignVertical: 'top',
+        fontSize: 14,
+        borderRadius: 5,
+    },
+    list: {
+        width: "90%",
+        maxHeight: 200,
+        padding: 10,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+    },
+    emptyText: {
+        color: '#999',
+        textAlign: 'center',
+        fontStyle: 'italic',
+    },
+    listItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 8,
+        paddingHorizontal: 4,
+        borderBottomWidth: 1,
+        borderBottomColor: '#eee',
+    },
+    listContent: {
+        flex: 1,
+        marginRight: 8,
+    },
+    listName: {
+        fontWeight: 'bold',
+        fontSize: 14,
+    },
+    listPreview: {
+        color: '#666',
+        fontSize: 12,
+    },
 });
-
-

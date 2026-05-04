@@ -12,8 +12,7 @@ const Wheel = ({ size = 300 }: Props) => {
     const radius = size / 2;
     if (items.length <= 1) {
         return <Svg width={size} height={size}>
-            <Circle cx={radius} cy={radius} r={radius}
-                strokeWidth={1} stroke={'#a6f'} fill={'#a6f6'} />
+            <Circle cx={radius} cy={radius} r={radius} strokeWidth={1} stroke={'#AA96DA'} fill={'#AA96DA'} fillOpacity={0.4} />
             <Text
                 x={size / 2}
                 y={size / 2 + 5}
