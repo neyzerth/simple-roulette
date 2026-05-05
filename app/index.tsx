@@ -1,6 +1,7 @@
 import { useAnimatedWheel } from '@/components/AnimatedWheel';
 import { Arrow } from '@/components/Arrow';
 import { parseTextToList } from '@/components/listInput';
+import { WinnerModal } from '@/components/WinnerModal';
 import Wheel from '@/components/Wheel';
 import { ItemsProvider, useItems } from '@/contexts/ItemsContext';
 import { addList, deleteList, getLists, List } from '@/storage/crud';
@@ -10,7 +11,11 @@ import Animated from 'react-native-reanimated';
 
 const WheelScreen = () => {
     const [winner, setWinner] = useState("--");
-    const { spin, animatedStyle } = useAnimatedWheel(setWinner);
+    const [modalVisible, setModalVisible] = useState(false);
+    const { spin, animatedStyle } = useAnimatedWheel((winnerName: string) => {
+        setWinner(winnerName);
+        setModalVisible(true);
+    });
     const { setItems } = useItems();
     const [rawList, setRawList] = useState("");
     const [listName, setListName] = useState("");
@@ -44,7 +49,15 @@ const WheelScreen = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.winner}>Winner: {winner}</Text>
+            <WinnerModal
+                visible={modalVisible}
+                winner={winner}
+                onClose={() => setModalVisible(false)}
+                onDelete={() => {
+                    // Delete functionality will be implemented in next iteration
+                    console.log('Delete item:', winner);
+                }}
+            />
 
             <Pressable onPress={spin} style={styles.wheel}>
                 <Arrow />
@@ -127,10 +140,6 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 22,
-        fontWeight: "bold",
-    },
-    winner: {
-        fontSize: 18,
         fontWeight: "bold",
     },
     nameInput: {
