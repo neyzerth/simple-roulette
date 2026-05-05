@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import {
   Modal,
   View,
@@ -16,47 +16,60 @@ interface WinnerModalProps {
   onDelete: () => void;
 }
 
-export const WinnerModal: React.FC<WinnerModalProps> = ({
+export const WinnerModal = ({
   visible,
   winner,
   onClose,
   onDelete,
-}) => {
+}: WinnerModalProps) => {
   const confettiRef = useRef<ConfettiCannon>(null);
+  const hasFiredRef = useRef(false);
 
   useEffect(() => {
-    if (visible && confettiRef.current) {
+    if (visible && !hasFiredRef.current && confettiRef.current) {
       confettiRef.current.start();
+      hasFiredRef.current = true;
+    }
+    if (!visible) {
+      hasFiredRef.current = false;
     }
   }, [visible]);
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     onDelete();
     onClose();
-  };
+  }, [onDelete, onClose]);
+
+  const handleBackdropPress = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  const handleModalPress = useCallback((e: { stopPropagation: () => void }) => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <Modal
       animationType="fade"
-      transparent={true}
+      transparent
       visible={visible}
       onRequestClose={onClose}
     >
-      <TouchableWithoutFeedback onPress={onClose}>
+      <TouchableWithoutFeedback onPress={handleBackdropPress}>
         <View style={styles.backdrop}>
-          <TouchableWithoutFeedback onPress={(e) => e.stopPropagation()}>
+          <TouchableWithoutFeedback onPress={handleModalPress}>
             <View style={styles.modalContainer}>
               <ConfettiCannon
                 ref={confettiRef}
                 count={200}
                 origin={{ x: -10, y: 0 }}
                 autoStart={false}
-                fadeOut={true}
+                fadeOut
               />
-              
+
               <Text style={styles.title}>We have a winner!</Text>
               <Text style={styles.winnerText}>{winner}</Text>
-              
+
               <View style={styles.buttonContainer}>
                 <Pressable
                   style={[styles.button, styles.deleteButton]}
@@ -64,7 +77,7 @@ export const WinnerModal: React.FC<WinnerModalProps> = ({
                 >
                   <Text style={styles.deleteButtonText}>Delete Item</Text>
                 </Pressable>
-                
+
                 <Pressable
                   style={[styles.button, styles.closeButton]}
                   onPress={onClose}

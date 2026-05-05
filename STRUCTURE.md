@@ -11,18 +11,28 @@ roulette/
 │   └── index.tsx                 # Main roulette screen (home route)
 │
 ├── components/                   # Reusable React components
-│   ├── AnimatedWheel.ts          # Hook for wheel rotation animation logic
-│   ├── Arrow.tsx                 # SVG arrow indicator component
-│   ├── listInput.ts              # Utility to parse text input to list
-│   ├── Slice.tsx                 # SVG slice component for wheel segments
-│   ├── useWheelMaths.ts          # Math utilities for wheel calculations
 │   ├── Wheel.tsx                 # Main wheel component (renders slices)
-│   └── WinnerModal.tsx           # Modal to display winning item with confetti
+│   ├── WheelSlice.tsx            # SVG slice component for wheel segments
+│   ├── WheelArrow.tsx            # SVG arrow indicator component
+│   ├── WinnerModal.tsx           # Modal to display winning item with confetti
+│   ├── ListInputForm.tsx         # Form for creating new lists
+│   └── SavedListsPanel.tsx       # Panel displaying saved lists
 │
 ├── contexts/                     # React Context providers
 │   └── ItemsContext.tsx          # Global state for wheel items
 │
+├── hooks/                        # Custom React hooks
+│   ├── useWheelSpin.ts           # Hook for wheel rotation animation
+│   ├── useWheelGame.ts           # Hook for wheel game state (winner, modal)
+│   └── useSavedLists.ts          # Hook for saved lists CRUD operations
+│
+├── utils/                        # Utility functions
+│   ├── wheelMath.ts              # Math utilities for wheel calculations
+│   ├── wheelColors.ts            # Wheel slice colors and assignment
+│   └── listParser.ts             # Parse text input to list array
+│
 ├── storage/                      # Data persistence layer
+│   ├── types.ts                  # Storage type definitions (List interface)
 │   ├── crud.ts                   # CRUD operations for saved lists
 │   └── db.ts                     # SQLite/localStorage abstraction
 │
@@ -49,18 +59,23 @@ The app uses **file-based routing** where files in `app/` automatically become r
 
 **ItemsContext** provides global state for the wheel items:
 - Stores the array of strings to display on the wheel
-- Used by multiple components (Wheel, AnimatedWheel, index screen)
+- Used by multiple components (Wheel, hooks/useWheelSpin, index screen)
+
+**Custom Hooks** encapsulate business logic:
+- `useWheelGame()` - Manages winner state, modal visibility, and spin callback
+- `useSavedLists()` - Manages saved lists CRUD operations and form state
+- `useWheelSpin()` - Handles wheel rotation animation
 
 ### Data Flow
 
 ```
 User Input (TextInput)
     ↓
-parseTextToList() → ItemsContext.setItems()
+ListInputForm → parseTextToList() → ItemsContext.setItems()
     ↓
 Wheel component re-renders with new slices
     ↓
-User taps wheel → useAnimatedWheel.spin()
+User taps wheel → useWheelSpin.spin()
     ↓
 Animation completes → WinnerModal displays result
 ```
@@ -79,17 +94,18 @@ The `storage/db.ts` file abstracts this difference, providing a unified `Storage
 ### Component Hierarchy
 
 ```
-Index (app/index.tsx)
+App (app/index.tsx)
 ├── ItemsProvider (context)
 │   ├── WinnerModal
 │   ├── Pressable (spin trigger)
-│   │   ├── Arrow
+│   │   ├── WheelArrow
 │   │   └── Animated.View
 │   │       └── Wheel
-│   │           └── Slice[] (SVG paths)
-│   ├── TextInput (list name)
-│   ├── TextInput (items)
-│   └── Saved Lists (Scrollable)
+│   │           └── WheelSlice[] (SVG paths)
+│   ├── ListInputForm
+│   │   ├── TextInput (list name)
+│   │   └── TextInput (items)
+│   └── SavedListsPanel (Scrollable)
 ```
 
 ### Key Dependencies
@@ -106,22 +122,24 @@ Index (app/index.tsx)
 ## File Responsibilities
 
 ### Core Screen
-- **`app/index.tsx`** - Main UI with wheel, inputs, and saved lists management
+- **`app/index.tsx`** - Composes hooks and components. ~60 lines of declarative JSX.
 
 ### Wheel System
-- **`Wheel.tsx`** - Renders SVG wheel based on items from context
-- **`Slice.tsx`** - Individual wheel segment with color and text
-- **`Arrow.tsx`** - Static pointer indicating winning position
-- **`AnimatedWheel.ts`** - Hook managing rotation animation and winner calculation
-- **`useWheelMaths.ts`** - Polar coordinate math and winner index calculation
+- **`components/Wheel.tsx`** - Renders SVG wheel based on items from context
+- **`components/WheelSlice.tsx`** - Individual wheel segment with color and text
+- **`components/WheelArrow.tsx`** - Static pointer indicating winning position
+- **`hooks/useWheelSpin.ts`** - Hook managing rotation animation and winner calculation
+- **`utils/wheelMath.ts`** - Polar coordinate math and winner index calculation
+- **`utils/wheelColors.ts`** - Color palette and slice color assignment logic
 
 ### Data Layer
+- **`storage/types.ts`** - TypeScript interfaces (List with id)
 - **`storage/db.ts`** - Low-level storage abstraction (SQLite/localStorage)
-- **`storage/crud.ts`** - High-level list operations (get, add, delete)
+- **`storage/crud.ts`** - High-level list operations (get, add, delete with unique ids)
 - **`contexts/ItemsContext.tsx`** - React context for current wheel items
 
 ### Utilities
-- **`components/listInput.ts`** - Parses comma/newline separated text into array
+- **`utils/listParser.ts`** - Parses comma/newline separated text into array
 
 ## Configuration Notes
 
@@ -133,3 +151,12 @@ Index (app/index.tsx)
 ## Build Output
 
 The `dist/` directory contains the static web build output (generated via `expo export`).
+
+## Code Style
+
+- **Consistent single quotes** across all files
+- **Consistent semicolons** for statement termination
+- **Named exports** preferred over default exports
+- **`useCallback`** for event handlers passed to child components
+- **Custom hooks** for business logic separation
+- **Presentational components** receive data via props
