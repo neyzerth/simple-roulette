@@ -46,12 +46,12 @@ const WheelScreen = () => {
         <View style={styles.container}>
             <Text style={styles.winner}>Winner: {winner}</Text>
 
-            <View style={styles.wheel}>
+            <Pressable onPress={spin} style={styles.wheel}>
                 <Arrow />
-                <Animated.View onTouchStart={spin} style={animatedStyle}>
+                <Animated.View style={animatedStyle}>
                     <Wheel />
                 </Animated.View>
-            </View>
+            </Pressable>
 
             <TextInput
                 placeholder="List name..."
