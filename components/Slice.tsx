@@ -6,18 +6,64 @@ interface Props {
     text: string;
     angle: number;
     radius: number;
+    color: string;
 }
 
-const SLICE_COLORS = [
+export const SLICE_COLORS = [
     '#FF6B6B',
     '#4ECDC4',
     '#FFE66D',
     '#95E1D3',
-    '#F38181',
+    '#ef81f3',
     '#AA96DA',
 ];
 
-export const Slice = ({ index, text, angle, radius }: Props) => {
+/**
+ * Assigns colors to slices with maximum variety while ensuring:
+ * - Adjacent slices never have the same color
+ * - 0-1 items use color index 0
+ * - Uses all available colors in a balanced way
+ */
+export function assignSliceColors(itemCount: number): string[] {
+    if (itemCount <= 1) {
+        return [SLICE_COLORS[0]];
+    }
+
+    const colors: string[] = [];
+    const numColors = SLICE_COLORS.length;
+
+    for (let index = 0; index < itemCount; index++) {
+        const leftNeighborIndex = (index - 1 + itemCount) % itemCount;
+        const rightNeighborIndex = (index + 1) % itemCount;
+
+        const leftNeighborColor = colors[leftNeighborIndex];
+        const rightNeighborColor = colors[rightNeighborIndex];
+
+        // Try colors in a rotating pattern to maximize variety
+        // Start from index % numColors to spread colors evenly
+        let colorIndex = index % numColors;
+        let attempts = 0;
+
+        while (attempts < numColors) {
+            const candidateColor = SLICE_COLORS[colorIndex];
+            if (candidateColor !== leftNeighborColor && candidateColor !== rightNeighborColor) {
+                colors[index] = candidateColor;
+                break;
+            }
+            colorIndex = (colorIndex + 1) % numColors;
+            attempts++;
+        }
+
+        // Fallback: use modulo-based assignment
+        if (!colors[index]) {
+            colors[index] = SLICE_COLORS[index % numColors];
+        }
+    }
+
+    return colors;
+}
+
+export const Slice = ({ index, text, angle, radius, color }: Props) => {
     const startAngle = index * angle - 90;
     const endAngle = startAngle + angle;
 
@@ -33,8 +79,6 @@ export const Slice = ({ index, text, angle, radius }: Props) => {
         A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}
         Z
     `;
-
-    const color = SLICE_COLORS[index % SLICE_COLORS.length];
 
     return (
         <>
