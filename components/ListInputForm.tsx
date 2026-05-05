@@ -1,10 +1,13 @@
 import { useCallback } from 'react';
 import {
-  Button,
+  Pressable,
+  Platform,
   StyleSheet,
+  Text,
   TextInput,
   View,
 } from 'react-native';
+import { useThemeStyles } from '@/styles/useThemeStyles';
 
 interface ListInputFormProps {
   listName: string;
@@ -21,6 +24,8 @@ export const ListInputForm = ({
   onChangeRawList,
   onSave,
 }: ListInputFormProps) => {
+  const { presets, colors } = useThemeStyles();
+
   const handleSave = useCallback(() => {
     onSave();
   }, [onSave]);
@@ -33,31 +38,48 @@ export const ListInputForm = ({
     onChangeRawList(text, items);
   }, [onChangeRawList]);
 
+  const isWeb = Platform.OS === 'web';
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isWeb && styles.webContainer]}>
       <TextInput
         placeholder="List name..."
-        placeholderTextColor="#999"
-        style={styles.nameInput}
+        placeholderTextColor={colors.placeholder}
+        style={[
+          presets.input,
+          styles.nameInput,
+          isWeb && styles.webNameInput,
+        ]}
         value={listName}
         onChangeText={onChangeName}
       />
 
       <TextInput
         multiline
-        numberOfLines={5}
+        numberOfLines={isWeb ? 8 : 5}
         placeholder="Item 1, Item 2, Item 3..."
-        placeholderTextColor="#999"
-        style={styles.textArea}
+        placeholderTextColor={colors.placeholder}
+        style={[
+          presets.input,
+          styles.textArea,
+          isWeb && styles.webTextArea,
+        ]}
         value={rawList}
         onChangeText={handleTextChange}
       />
 
-      <Button
-        title="Save List"
+      <Pressable
         onPress={handleSave}
         disabled={!rawList.trim()}
-      />
+        style={({ pressed }) => [
+          styles.saveButton,
+          { backgroundColor: colors.accent },
+          !rawList.trim() && styles.saveButtonDisabled,
+          pressed && styles.saveButtonPressed,
+        ]}
+      >
+        <Text style={styles.saveButtonText}>Save List</Text>
+      </Pressable>
     </View>
   );
 };
@@ -68,23 +90,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
+  webContainer: {
+    alignItems: 'stretch',
+  },
   nameInput: {
-    height: 40,
+    height: 44,
     width: 250,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    fontSize: 14,
-    borderRadius: 5,
+  },
+  webNameInput: {
+    width: '100%',
   },
   textArea: {
     minHeight: 80,
     width: 250,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
     textAlignVertical: 'top',
-    fontSize: 14,
-    borderRadius: 5,
+  },
+  webTextArea: {
+    width: '100%',
+    minHeight: 120,
+  },
+  saveButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120,
+  },
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
+  saveButtonPressed: {
+    opacity: 0.8,
+  },
+  saveButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700',
   },
 });

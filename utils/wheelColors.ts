@@ -1,10 +1,23 @@
+/**
+ * Rainbow color palette for wheel slices.
+ * Bright, vibrant colors arranged in spectrum order.
+ */
 export const SLICE_COLORS = [
-  '#FF6B6B',
-  '#4ECDC4',
-  '#FFE66D',
-  '#95E1D3',
-  '#ef81f3',
-  '#AA96DA',
+  '#FF0000', // Red
+  '#FF4500', // Orange Red
+  '#FF8C00', // Dark Orange
+  '#FFD700', // Gold
+  '#ADFF2F', // Green Yellow
+  '#00FF00', // Lime
+  '#00CED1', // Dark Turquoise
+  '#1E90FF', // Dodger Blue
+  '#4169E1', // Royal Blue
+  '#8A2BE2', // Blue Violet
+  '#9400D3', // Dark Violet
+  '#FF1493', // Deep Pink
+  '#FF69B4', // Hot Pink
+  '#00FA9A', // Medium Spring Green
+  '#20B2AA', // Light Sea Green
 ];
 
 /**

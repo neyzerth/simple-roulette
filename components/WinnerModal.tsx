@@ -8,6 +8,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import ConfettiCannon from 'react-native-confetti-cannon';
+import { useThemeStyles } from '@/styles/useThemeStyles';
 
 interface WinnerModalProps {
   visible: boolean;
@@ -22,6 +23,7 @@ export const WinnerModal = ({
   onClose,
   onDelete,
 }: WinnerModalProps) => {
+  const { presets } = useThemeStyles();
   const confettiRef = useRef<ConfettiCannon>(null);
   const hasFiredRef = useRef(false);
 
@@ -56,9 +58,9 @@ export const WinnerModal = ({
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={handleBackdropPress}>
-        <View style={styles.backdrop}>
+        <View style={presets.modal.backdrop}>
           <TouchableWithoutFeedback onPress={handleModalPress}>
-            <View style={styles.modalContainer}>
+            <View style={presets.modal.container}>
               <ConfettiCannon
                 ref={confettiRef}
                 count={200}
@@ -67,22 +69,30 @@ export const WinnerModal = ({
                 fadeOut
               />
 
-              <Text style={styles.title}>We have a winner!</Text>
-              <Text style={styles.winnerText}>{winner}</Text>
+              <Text style={[presets.text.title, styles.titleMargin]}>
+                We have a winner!
+              </Text>
+              <Text style={[presets.text.winner, styles.winnerMargin]}>
+                {winner}
+              </Text>
 
               <View style={styles.buttonContainer}>
                 <Pressable
-                  style={[styles.button, styles.deleteButton]}
+                  style={[presets.button.base, presets.button.danger]}
                   onPress={handleDelete}
                 >
-                  <Text style={styles.deleteButtonText}>Delete Item</Text>
+                  <Text style={presets.button.dangerText}>
+                    Delete Item
+                  </Text>
                 </Pressable>
 
                 <Pressable
-                  style={[styles.button, styles.closeButton]}
+                  style={[presets.button.base, presets.button.primary]}
                   onPress={onClose}
                 >
-                  <Text style={styles.closeButtonText}>Close</Text>
+                  <Text style={presets.button.primaryText}>
+                    Close
+                  </Text>
                 </Pressable>
               </View>
             </View>
@@ -94,67 +104,16 @@ export const WinnerModal = ({
 };
 
 const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 24,
-    width: '80%',
-    maxWidth: 400,
-    alignItems: 'center',
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  titleMargin: {
     marginBottom: 16,
-    color: '#333',
   },
-  winnerText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#007AFF',
+  winnerMargin: {
     marginBottom: 32,
-    textAlign: 'center',
   },
   buttonContainer: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     width: '100%',
     gap: 12,
-  },
-  button: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  closeButton: {
-    backgroundColor: '#007AFF',
-  },
-  closeButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  deleteButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#FF3B30',
-  },
-  deleteButtonText: {
-    color: '#FF3B30',
-    fontWeight: 'bold',
-    fontSize: 16,
   },
 });

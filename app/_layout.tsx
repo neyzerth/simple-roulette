@@ -1,5 +1,12 @@
-import { Stack } from "expo-router";
+import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export default function RootLayout() {
-  return <Stack />;
+  return (
+    <ThemeProvider>
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }} />
+    </ThemeProvider>
+  );
 }

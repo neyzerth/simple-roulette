@@ -44,13 +44,29 @@ export const WheelSlice = ({
         strokeWidth={1}
         stroke={color}
         fill={color}
-        fillOpacity={0.4}
+        fillOpacity={0.85}
       />
+      {/* Shadow/outline text for readability */}
       <Text
         x={centerText.x}
         y={centerText.y}
         fill="black"
         fontSize="14"
+        fontWeight="600"
+        textAnchor="middle"
+        transform={`rotate(${startAngle + angle / 2 + 90} ${centerText.x} ${centerText.y})`}
+        stroke="rgba(0, 0, 0, 0.5)"
+        strokeWidth="0.5"
+      >
+        {text}
+      </Text>
+      {/* Main white text */}
+      <Text
+        x={centerText.x}
+        y={centerText.y}
+        fill="white"
+        fontSize="14"
+        fontWeight="600"
         textAnchor="middle"
         transform={`rotate(${startAngle + angle / 2 + 90} ${centerText.x} ${centerText.y})`}
       >

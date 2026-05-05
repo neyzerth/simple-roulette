@@ -7,7 +7,7 @@
 ```
 roulette/
 ├── app/                          # Expo Router routes (file-based routing)
-│   ├── _layout.tsx               # Root layout - wraps all screens
+│   ├── _layout.tsx               # Root layout - wraps all screens, ThemeProvider
 │   └── index.tsx                 # Main roulette screen (home route)
 │
 ├── components/                   # Reusable React components
@@ -19,12 +19,18 @@ roulette/
 │   └── SavedListsPanel.tsx       # Panel displaying saved lists
 │
 ├── contexts/                     # React Context providers
-│   └── ItemsContext.tsx          # Global state for wheel items
+│   ├── ItemsContext.tsx          # Global state for wheel items
+│   └── ThemeContext.tsx          # Theme provider (light/dark mode)
 │
 ├── hooks/                        # Custom React hooks
 │   ├── useWheelSpin.ts           # Hook for wheel rotation animation
 │   ├── useWheelGame.ts           # Hook for wheel game state (winner, modal)
 │   └── useSavedLists.ts          # Hook for saved lists CRUD operations
+│
+├── styles/                       # Global theming and style presets
+│   ├── colors.ts                 # Light/dark color palettes
+│   ├── presets.ts                # Theme-aware style factories
+│   └── useThemeStyles.ts         # Hook combining theme + presets
 │
 ├── utils/                        # Utility functions
 │   ├── wheelMath.ts              # Math utilities for wheel calculations
@@ -52,7 +58,7 @@ roulette/
 
 The app uses **file-based routing** where files in `app/` automatically become routes:
 
-- `app/_layout.tsx` - Root layout component that wraps all screens with common providers
+- `app/_layout.tsx` - Root layout component that wraps all screens with ThemeProvider and StatusBar
 - `app/index.tsx` - The main screen (accessible at `/`)
 
 ### State Management
@@ -61,10 +67,44 @@ The app uses **file-based routing** where files in `app/` automatically become r
 - Stores the array of strings to display on the wheel
 - Used by multiple components (Wheel, hooks/useWheelSpin, index screen)
 
+**ThemeContext** provides system-aware theming:
+- Uses `useColorScheme()` to detect light/dark mode
+- Exposes `isDark` boolean and `colors` object
+- Wrapped by `useThemeStyles()` hook for convenient preset access
+
 **Custom Hooks** encapsulate business logic:
 - `useWheelGame()` - Manages winner state, modal visibility, and spin callback
 - `useSavedLists()` - Manages saved lists CRUD operations and form state
 - `useWheelSpin()` - Handles wheel rotation animation
+- `useThemeStyles()` - Returns themed presets for consistent UI styling
+
+### Theming System
+
+The app follows a centralized theming approach separating **appearance** from **layout**:
+
+**`styles/colors.ts`** - Color definitions:
+- `lightColors` / `darkColors` objects
+- `ThemeColors` interface
+
+**`styles/presets.ts`** - Style factories that take colors and return complete style objects:
+- `presets.input(colors)` - TextInput appearance (border, background, text color)
+- `presets.card(colors)` - Card containers (background, border, radius)
+- `presets.container(colors)` - Screen backgrounds
+- `presets.modal.backdrop/container(colors)` - Modal styling
+- `presets.text.*(colors)` - Typography variants (title, body, muted, etc.)
+- `presets.button.*(colors)` - Button variants (primary, danger)
+
+**`styles/useThemeStyles.ts`** - Convenience hook:
+- Wraps `useTheme()` + `useMemo`
+- Returns `presets` object with all themed styles pre-computed
+- Also exposes `colors` and `isDark` for direct access
+
+**Usage in components:**
+```tsx
+const { presets, colors } = useThemeStyles();
+// Appearance from presets, layout from local StyleSheet
+<TextInput style={[presets.input, localStyles.nameInput]} />
+```
 
 ### Data Flow
 
@@ -122,7 +162,7 @@ App (app/index.tsx)
 ## File Responsibilities
 
 ### Core Screen
-- **`app/index.tsx`** - Composes hooks and components. ~60 lines of declarative JSX.
+- **`app/index.tsx`** - Composes hooks and components. Responsive layout (web vs mobile).
 
 ### Wheel System
 - **`components/Wheel.tsx`** - Renders SVG wheel based on items from context
@@ -131,6 +171,12 @@ App (app/index.tsx)
 - **`hooks/useWheelSpin.ts`** - Hook managing rotation animation and winner calculation
 - **`utils/wheelMath.ts`** - Polar coordinate math and winner index calculation
 - **`utils/wheelColors.ts`** - Color palette and slice color assignment logic
+
+### Theming System
+- **`styles/colors.ts`** - Light/dark color palette definitions
+- **`styles/presets.ts`** - Style factory functions for consistent theming
+- **`styles/useThemeStyles.ts`** - Hook providing themed presets
+- **`contexts/ThemeContext.tsx`** - React context for theme state (imports from colors.ts)
 
 ### Data Layer
 - **`storage/types.ts`** - TypeScript interfaces (List with id)
@@ -147,6 +193,7 @@ App (app/index.tsx)
 - **Typed Routes**: Enabled for type-safe navigation
 - **Path Alias**: `@/*` maps to project root for clean imports
 - **Web Export**: Static HTML export configured for web builds
+- **User Interface Style**: Automatic (`userInterfaceStyle: automatic` in app.json)
 
 ## Build Output
 
@@ -160,3 +207,4 @@ The `dist/` directory contains the static web build output (generated via `expo 
 - **`useCallback`** for event handlers passed to child components
 - **Custom hooks** for business logic separation
 - **Presentational components** receive data via props
+- **Global style presets** for theming consistency (appearance in presets, layout in components)

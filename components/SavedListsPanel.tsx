@@ -1,12 +1,14 @@
 import { useCallback } from 'react';
 import {
   Button,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { List } from '@/storage/types';
+import { useThemeStyles } from '@/styles/useThemeStyles';
 
 interface SavedListsPanelProps {
   lists: List[];
@@ -19,6 +21,8 @@ export const SavedListsPanel = ({
   onLoad,
   onDelete,
 }: SavedListsPanelProps) => {
+  const { presets, colors } = useThemeStyles();
+
   const handleDelete = useCallback(
     (id: string) => {
       onDelete(id);
@@ -26,25 +30,47 @@ export const SavedListsPanel = ({
     [onDelete]
   );
 
+  const isWeb = Platform.OS === 'web';
+
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        presets.card,
+        styles.container,
+        isWeb && styles.webContainer,
+      ]}
+    >
       {lists.length === 0 && (
-        <Text style={styles.emptyText}>No saved lists yet</Text>
+        <Text style={[presets.text.mutedItalic, styles.emptyText]}>
+          No saved lists yet
+        </Text>
       )}
 
-      {lists.map((list) => (
+      {lists.map((list, index) => (
         <Pressable
           key={list.id}
-          style={styles.listItem}
+          style={[
+            styles.listItem,
+            index < lists.length - 1 && { borderBottomColor: colors.borderLight },
+          ]}
           onPress={() => onLoad(list)}
         >
           <View style={styles.listContent}>
-            <Text style={styles.listName}>{list.name}</Text>
-            <Text style={styles.listPreview} numberOfLines={1}>
+            <Text style={presets.text.bodyBold}>
+              {list.name}
+            </Text>
+            <Text
+              style={presets.text.secondary}
+              numberOfLines={1}
+            >
               {list.rawList}
             </Text>
           </View>
-          <Button title="Delete" onPress={() => handleDelete(list.id)} />
+          <Button
+            title="Delete"
+            onPress={() => handleDelete(list.id)}
+            color={colors.danger}
+          />
         </Pressable>
       ))}
     </View>
@@ -54,36 +80,26 @@ export const SavedListsPanel = ({
 const styles = StyleSheet.create({
   container: {
     width: '90%',
-    maxHeight: 200,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    padding: 12,
+  },
+  webContainer: {
+    width: '100%',
+    maxHeight: 400,
   },
   emptyText: {
-    color: '#999',
     textAlign: 'center',
-    fontStyle: 'italic',
+    paddingVertical: 20,
   },
   listItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 8,
-    paddingHorizontal: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
   listContent: {
     flex: 1,
     marginRight: 8,
-  },
-  listName: {
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  listPreview: {
-    color: '#666',
-    fontSize: 12,
   },
 });

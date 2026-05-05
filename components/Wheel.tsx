@@ -1,6 +1,7 @@
 import { useItems } from '@/contexts/ItemsContext';
+import { useThemeStyles } from '@/styles/useThemeStyles';
 import Svg, { Circle, Text } from 'react-native-svg';
-import { assignSliceColors, SLICE_COLORS } from '@/utils/wheelColors';
+import { assignSliceColors } from '@/utils/wheelColors';
 import { WheelSlice } from './WheelSlice';
 
 interface WheelProps {
@@ -9,6 +10,7 @@ interface WheelProps {
 
 const Wheel = ({ size = 300 }: WheelProps) => {
   const { items } = useItems();
+  const { presets } = useThemeStyles();
   const radius = size / 2;
 
   if (items.length <= 1) {
@@ -19,15 +21,15 @@ const Wheel = ({ size = 300 }: WheelProps) => {
           cy={radius}
           r={radius}
           strokeWidth={1}
-          stroke={SLICE_COLORS[0]}
-          fill={SLICE_COLORS[0]}
-          fillOpacity={0.4}
+          stroke={presets.card.borderColor}
+          fill={presets.card.backgroundColor}
         />
         <Text
           x={size / 2}
           y={size / 2 + 5}
-          fill="black"
-          fontSize="25"
+          fill={presets.text.muted.color}
+          fontSize="18"
+          fontWeight="500"
           textAnchor="middle"
         >
           {items[0] || 'Add items to spin!'}
@@ -37,7 +39,7 @@ const Wheel = ({ size = 300 }: WheelProps) => {
   }
 
   const angle = 360 / items.length;
-  const colors = assignSliceColors(items.length);
+  const sliceColors = assignSliceColors(items.length);
 
   const slices = items.map((item, index) => (
     <WheelSlice
@@ -46,7 +48,7 @@ const Wheel = ({ size = 300 }: WheelProps) => {
       text={item}
       angle={angle}
       radius={radius}
-      color={colors[index]}
+      color={sliceColors[index]}
     />
   ));
 
